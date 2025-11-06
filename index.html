@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turtle Graphics Pattern Competition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #9B1B30; /* crimson purple */
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            padding: 2rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        .content {
+            max-width: 1200px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: rgba(155, 27, 48, 1); /* transparent crimson purple */
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            border: 2px solid #FFD700; /* gold */
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .content::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: rgba(155, 27, 48, 0.3);
+            border-radius: 10px;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: #FFD700;
+            border-radius: 10px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scale(0.9) translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        h1, h2, h3, p, ul, li, .subtitle, .highlight, .placeholder-text, .points-badge, .slide-counter, .nav-btn, .bonus-card p, .submission-section p {
+            color: #FFD700; /* gold text */
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            animation: glow 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            to { text-shadow: 0 0 30px rgba(255, 215, 0, 0.9); }
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .info-card {
+            background: rgba(155, 27, 48, 1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 2px solid #FFD700;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .info-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.7);
+            background: rgba(155, 27, 48, 0.7);
+        }
+
+        .pattern-slide {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .points-badge {
+            display: inline-block;
+            background: rgba(155, 27, 48, 0.6);
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            border: 2px solid #FFD700;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .image-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            border: 3px solid #FFD700;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(155, 27, 48, 0.6);
+            border: 2px solid #FFD700;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.6);
+            background: rgba(155, 27, 48, 0.8);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 5px;
+            background: #FFD700;
+            transition: width 0.3s ease;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.8);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(155, 27, 48, 0.6);
+            padding: 1rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: 2px solid #FFD700;
+            z-index: 1001;
+        }
+
+        ul {
+            font-size: 1.2rem;
+            line-height: 2;
+            margin-left: 2rem;
+        }
+    .image-container:hover {
+            transform: scale(1) rotate(0deg);
+            box-shadow: 0 0px 0px rgba(218, 165, 32, 0.8);
+        }
+    .image-container:hover {
+        transition: all .2s ease-in-out;
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 20px 50px rgba(218, 165, 32, 0.8);
+        }
+        .bonus-card {
+            background: rgba(155, 27, 48, 0.6);
+            border: 3px solid #FFD700;
+            padding: 2rem;
+            border-radius: 20px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .bonus-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .floating-particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            50% { transform: translateY(-100px) translateX(50px); opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+   <body>
+    <div class="floating-particles" id="particles"></div>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter" id="slideCounter">1 / 9</div>
+
+    <!-- Slide 1: Title -->
+    <div class="slide active">
+        <div class="content">
+            <h1>🎨 Ada's Core Round II</h1>
+            <p class="subtitle">Pattern Creation with Python Turtle</p>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>⏱️ Time</h3>
+                    <p>2 Hours</p>
+                </div>
+                <div class="info-card">
+                    <h3>📐 Patterns</h3>
+                    <p>6 Required Patterns</p>
+                </div>
+                <div class="info-card">
+                    <h3>🎯 Total Points</h3>
+                    <p>Up to 90 Points</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Pattern Overview -->
+    <div class="slide">
+        <div class="content">
+            <h2>📊 Pattern Difficulty Levels</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>🟢 Easy</h3>
+                    <p><strong>5 Points Each</strong></p>
+                    <p>Hypnotic Square<br>Spiralling Star</p>
+                </div>
+                <div class="info-card">
+                    <h3>🟡 Medium</h3>
+                    <p><strong>15 Points Each</strong></p>
+                    <p>Geometric Flower<br>Archaic Flower</p>
+                </div>
+                <div class="info-card">
+                    <h3>🔴 Hard</h3>
+                    <p><strong>20 Points Each</strong></p>
+                    <p>Dandelion<br>The Sun</p>
+                </div>
+            </div>
+            <div class="bonus-card">
+                <h3>🌟 BONUS PATTERN</h3>
+                <p style="font-size: 1.3rem; font-weight: bold;">Draw your most creative pattern: 1-20 Points based on creativity!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Hypnotic Square -->
+    <div class="slide">
+        <div class="content">
+            <div class="pattern-slide">
+                <div class="pattern-info">
+                    <h2>Hypnotic Square</h2>
+                    <h3>🟢 Easy Pattern</h3>
+                    <p>A mesmerizing pattern featuring rotating squares that create an optical illusion effect. Perfect for beginners to master loops and rotation.</p>
+                    <span class="points-badge">5 Points</span>
+                </div>
+                <div class="image-container">
+                    <img src="Untitled design (3).png">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Spiralling Star -->
+    <div class="slide">
+        <div class="content">
+            <div class="pattern-slide">
+                <div class="pattern-info">
+                    <h2>Spiralling Star</h2>
+                    <h3>🟢 Easy Pattern</h3>
+                    <p>A dynamic star pattern that spirals outward, combining geometric precision with artistic flair. Great for practicing angles and repetition.</p>
+                    <span class="points-badge">5 Points</span>
+                </div>
+                <div class="image-container">
+                    <img src="Untitled design (4).png">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Geometric Flower -->
+    <div class="slide">
+        <div class="content">
+            <div class="pattern-slide">
+                <div class="pattern-info">
+                    <h2>Geometric Flower</h2>
+                    <h3>🟡 Medium Pattern</h3>
+                    <p>An elegant floral design built from geometric shapes. Requires careful calculation of angles and positioning to create symmetrical beauty.</p>
+                    <span class="points-badge">15 Points</span>
+                </div>
+                <div class="image-container">
+                    <img src="Untitled design (5).png">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Archaic Flower -->
+    <div class="slide">
+        <div class="content">
+            <div class="pattern-slide">
+                <div class="pattern-info">
+                    <h2>Archaic Flower</h2>
+                    <h3>🟡 Medium Pattern</h3>
+                    <p>A classical floral pattern inspired by ancient art. Challenges your ability to blend curves and precision for a timeless design.</p>
+                    <span class="points-badge">15 Points</span>
+                </div>
+                <div class="image-container">
+                    <img src="Untitled design (6).png">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Dandelion -->
+    <div class="slide">
+        <div class="content">
+            <div class="pattern-slide">
+                <div class="pattern-info">
+                    <h2>Dandelion</h2>
+                    <h3>🔴 Hard Pattern</h3>
+                    <p>A complex organic pattern mimicking the delicate structure of a dandelion. Requires advanced techniques for creating natural-looking irregularity.</p>
+                    <span class="points-badge">20 Points</span>
+                </div>
+                <div class="image-container">
+                    <img src="Untitled design (7).png">
+           
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: The Sun -->
+    <div class="slide">
+        <div class="content">
+            <div class="pattern-slide">
+                <div class="pattern-info">
+                    <h2>The Sun</h2>
+                    <h3>🔴 Hard Pattern</h3>
+                    <p>A radiant sun pattern with intricate rays and details. The ultimate test of your turtle graphics mastery combining multiple techniques.</p>
+                    <span class="points-badge">20 Points</span>
+                </div>
+                <div class="image-container">
+                    <img src="Untitled design (8).png">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Submission Instructions -->
+    <div class="slide">
+        <div class="content">
+            <h2>📤 Submission Instructions</h2>
+            <div class="submission-section">
+                <h3>📁 File Structure:</h3>
+                <ul>
+                    <li>Create a folder named with your <span class="highlight">delegation number</span></li>
+                    <li>Example: <span class="highlight">111</span> (folder name)</li>
+                    <li>Inside the folder, save each pattern as a separate <span class="highlight">.txt file</span></li>
+                    <li>Example: <span class="highlight">dandelion.txt</span></li>
+                </ul>
+
+                <h3>📧 Email Submission:</h3>
+                <ul>
+                    <li>Send folder to: <span class="highlight">shahzadashadabali@gmail.com</span></li>
+                    <li>Submit at the <span class="highlight">end of the round</span></li>
+                </ul>
+
+                <h3>💻 Compiler:</h3>
+                <p>Use Python Sandbox:</p>
+                <p><span class="highlight">https://www.pythonsandbox.com/turtle</span></p>
+
+                <div class="bonus-card">
+                    <h3>⭐ Important Note</h3>
+                    <p style="font-size: 1.2rem; font-weight: bold;">Your patterns don't need to be perfect replicas. You'll earn points based on resemblance!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Previous</button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const progressBar = document.getElementById('progressBar');
+        const slideCounter = document.getElementById('slideCounter');
+
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 15; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 10 + 5 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            progressBar.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+            slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+            updateSlide();
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</body>
+</html>
